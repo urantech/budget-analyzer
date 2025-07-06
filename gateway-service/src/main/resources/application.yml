@@ -12,7 +12,7 @@ spring:
 
 kafka:
   topics:
-    transactions: new.transactions
+    transactions: new.document
 
 telegram:
   bot:
