@@ -17,8 +17,13 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+    open-in-view: false
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: new.document.group
       auto-offset-reset: earliest
+kafka:
+  topics:
+    transactions: new.transactions
+    analytics: new.analytics
