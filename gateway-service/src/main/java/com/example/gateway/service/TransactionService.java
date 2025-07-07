@@ -1,6 +1,7 @@
 package com.example.gateway.service;
 
 import com.example.gateway.model.Transaction;
+import com.example.kafka.dto.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TransactionService {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, TransactionDto> kafkaTemplate;
 
     @Value("${kafka.topics.transactions}")
     private String transactionsTopic;
@@ -24,7 +25,17 @@ public class TransactionService {
      */
     public void sendTransaction(Transaction transaction) {
         log.info("Sending transaction to Kafka: {}", transaction);
-        kafkaTemplate.send(transactionsTopic, String.valueOf(transaction.getUserId()), transaction);
+
+        TransactionDto transactionDto = TransactionDto.builder()
+                .id(transaction.getId())
+                .userId(transaction.getUserId())
+                .description(transaction.getDescription())
+                .amount(transaction.getAmount())
+                .category(transaction.getCategory())
+                .timestamp(transaction.getTimestamp())
+                .build();
+
+        kafkaTemplate.send(transactionsTopic, String.valueOf(transaction.getUserId()), transactionDto);
         log.info("Transaction sent successfully");
     }
 }

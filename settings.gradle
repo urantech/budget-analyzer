@@ -2,3 +2,4 @@ rootProject.name = 'multi-service-project'
 
 include 'gateway-service'
 include 'document-processing-service'
+include 'kafka-dto'

@@ -1,0 +1,13 @@
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+}
+
+// This is a library module, so we don't need the Spring Boot plugin
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
