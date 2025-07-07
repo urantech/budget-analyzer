@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class NewDocumentHandler {
+public class KafkaConsumer {
 
     private final DocumentProcessor processor;
 
     @KafkaListener(topics = "new.document")
-    public void listen(TransactionDto transactionDto) {
+    public void receive(TransactionDto transactionDto) {
         log.info("Received new document event with transaction ID: {}", transactionDto.getId());
         processor.process(transactionDto);
     }
