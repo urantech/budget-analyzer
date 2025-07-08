@@ -1,10 +1,10 @@
 package com.example.document.service;
 
+import com.example.document.publisher.KafkaMessagePublisher;
 import com.example.kafka.dto.TransactionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DocumentProcessor {
 
-    private final KafkaTemplate<String, TransactionDto> kafkaTemplate;
+    private final KafkaMessagePublisher publisher;
 
     @Value("${kafka.topics.transactions}")
     private String transactionTopic;
@@ -39,8 +39,8 @@ public class DocumentProcessor {
         }
 
         for (var transaction : mockTransactions) {
-            kafkaTemplate.send(transactionTopic, transaction);
-            kafkaTemplate.send(analyticsTopic, transaction);
+            publisher.publish(transactionTopic, transaction);
+            publisher.publish(analyticsTopic, transaction);
         }
         log.info("Send {} transactions to topics: {}, {}", mockTransactions.size(), transactionTopic, analyticsTopic);
     }
