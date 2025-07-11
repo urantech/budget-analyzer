@@ -18,3 +18,8 @@ spring:
         format_sql: true
     show-sql: true
     open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: new.transaction.group
+      auto-offset-reset: earliest

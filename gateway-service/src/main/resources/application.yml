@@ -20,3 +20,6 @@ telegram:
   bot:
     username: ${TELEGRAM_BOT_USERNAME}
     token: ${TELEGRAM_BOT_TOKEN}
+
+transaction-service:
+  base-url: http://localhost:8083/srv/transactions
