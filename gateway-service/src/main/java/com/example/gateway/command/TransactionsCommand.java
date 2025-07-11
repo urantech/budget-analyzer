@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class TransactionsMonthCommand implements Command {
+public class TransactionsCommand implements Command {
 
     private final TransactionServiceClient transactionServiceClient;
 
@@ -29,6 +29,6 @@ public class TransactionsMonthCommand implements Command {
 
     @Override
     public boolean canHandle(String messageText) {
-        return messageText.startsWith("/transactions-month");
+        return messageText.startsWith("/transactions");
     }
 }

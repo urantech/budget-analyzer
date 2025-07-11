@@ -10,8 +10,7 @@ public class StartCommand implements Command {
     public String execute(User user, String messageText) {
         return """
                 Welcome to Budget Analyzer Bot, %s! How can I help you today?
-                Please, enter one of the commands:
-                /upload - upload bank account pdf
+                Please, enter '/' for view of commands
                 """.formatted(user.getFirstName());
     }
 

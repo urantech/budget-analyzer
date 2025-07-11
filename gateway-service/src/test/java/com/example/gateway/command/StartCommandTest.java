@@ -29,7 +29,6 @@ class StartCommandTest {
         String result = startCommand.execute(testUser, "/start");
 
         assertTrue(result.contains("Welcome to Budget Analyzer Bot, Test!"));
-        assertTrue(result.contains("/upload"));
     }
 
     @Test
