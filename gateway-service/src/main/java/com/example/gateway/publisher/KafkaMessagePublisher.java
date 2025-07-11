@@ -23,8 +23,7 @@ public class KafkaMessagePublisher {
     public void publish(TransactionDto transactionDto) {
         log.info("Sending transaction to Kafka: {}", transactionDto);
         try {
-            CompletableFuture<SendResult<String, TransactionDto>> future = kafkaTemplate
-                    .send(transactionsTopic, String.valueOf(transactionDto.getUserId()), transactionDto);
+            CompletableFuture<SendResult<String, TransactionDto>> future = kafkaTemplate.send(transactionsTopic, transactionDto);
             future.whenComplete((res, ex) -> {
                 if (ex == null) {
                     log.info("Transaction sent successfully");
