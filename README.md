@@ -64,7 +64,7 @@ To add a new service:
 - **PostgreSQL**: Available at `localhost:5432`
   - Username: postgres
   - Password: postgres
-  - Database: document_db
+  - Database: transaction_db
 
 - **Kafka**: Available at `localhost:29092`
 
