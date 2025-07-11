@@ -8,65 +8,39 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.EmbeddedKafkaZKBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
-@DirtiesContext
-@Import(KafkaConsumerIntegrationTest.TestConfig.class)
-@EmbeddedKafka(partitions = 1, brokerProperties = {
-        "listeners=PLAINTEXT://localhost:9092", "port=9092"
-})
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 class KafkaConsumerIntegrationTest {
 
     public static final String TOPIC = "new.document";
 
-    @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
+    @MockBean
+    private DocumentProcessor documentProcessor;
 
     private Producer<String, TransactionDto> producer;
-
-    @SpyBean
-    private KafkaConsumer consumer;
 
     @Captor
     private ArgumentCaptor<TransactionDto> transactionCaptor;
 
-    static class TestConfig {
-        @Bean
-        public EmbeddedKafkaBroker embeddedKafkaBroker() {
-            return new EmbeddedKafkaZKBroker(1, true, TOPIC);
-        }
-
-        @Bean
-        @Primary
-        public DocumentProcessor documentProcessor() {
-            return mock(DocumentProcessor.class);
-        }
-    }
-
     @BeforeEach
-    void setUp() {
+    void setUp(@Autowired EmbeddedKafkaBroker embeddedKafkaBroker) {
         Map<String, Object> props = KafkaTestUtils.producerProps(embeddedKafkaBroker);
         DefaultKafkaProducerFactory<String, TransactionDto> producerFactory =
                 new DefaultKafkaProducerFactory<>(props, new StringSerializer(), new JsonSerializer<>());
@@ -81,7 +55,8 @@ class KafkaConsumerIntegrationTest {
     }
 
     @Test
-    void shouldReceiveMessage() {
+    void shouldReceiveMessage() throws InterruptedException {
+        Thread.sleep(2000);
         TransactionDto transaction = TransactionDto.builder()
                 .id(1L)
                 .userId(2L)
@@ -90,7 +65,7 @@ class KafkaConsumerIntegrationTest {
         producer.send(new ProducerRecord<>(TOPIC, transaction));
         producer.flush();
 
-        verify(consumer, timeout(5000).times(1)).receive(transactionCaptor.capture());
+        verify(documentProcessor, timeout(5000).times(1)).process(transactionCaptor.capture());
         TransactionDto processedTransaction = transactionCaptor.getValue();
         assertEquals(1L, processedTransaction.getId());
     }
